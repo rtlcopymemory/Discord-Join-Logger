@@ -1,10 +1,13 @@
 require('dotenv').config()
 
+const axios = require('axios');
 const { Client, Intents } = require('discord.js');
 const { Permissions } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_WEBHOOKS] });
 
 const { handleCommands } = require('./commands.js');
+const { db } = require('./db');
+const { evaluator } = require('./evaluator.js');
 
 const prefix = (process.env.PREFIX).trim().toLowerCase();
 
@@ -13,7 +16,67 @@ client.on('ready', () => {
 });
 
 client.on('guildMemberAdd', async member => {
+    db.get("SELECT webhook FROM servers WHERE serverID = ?", [member.guild.id], (err, row) => {
+        if (!!err) {
+            console.log(`There was an error!\n${err}`)
+        }
 
+        if (!row)
+            return;
+
+        let susScore = evaluator(member);
+
+        axios.post(row.webhook, {
+            "content": member.id,
+            "embeds": [{
+                "color": parseInt("2f3136", 16),
+                "title": "New Member Join!",
+                "fields": [
+                    {
+                        name: "Username",
+                        value: member.displayName,
+                        inline: true
+                    },
+                    {
+                        name: "ID",
+                        value: member.id,
+                        inline: true
+                    },
+                    {
+                        name: "Joined at",
+                        value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:f>`,
+                        inline: true
+                    },
+                    {
+                        name: "Account Creation",
+                        value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:f>`,
+                        inline: true
+                    },
+                    {
+                        name: "Account age",
+                        value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`,
+                        inline: true
+                    },
+                    {
+                        name: "Badges",
+                        value: member.user.flags.toArray().length,
+                        inline: true
+                    },
+                    {
+                        name: "Sus Grade",
+                        value: `${susScore}`,
+                        inline: true
+                    }
+                ],
+                "image": {
+                    "url": member.user.avatarURL()
+                }
+            }]
+        })
+            .catch(error => {
+                console.log("Soemthing failed while sending the webhook\n" + error);
+            });
+    });
 });
 
 client.on('messageCreate', async message => {
