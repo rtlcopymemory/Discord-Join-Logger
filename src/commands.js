@@ -38,6 +38,13 @@ async function handleLink(message, serverID) {
         throw "Command not called in a normal Text Channel";
     }
 
+    // check that the person giving the command has permissions to remove this
+    let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
+    let user = server.members.cache.get(message.author.id) || server.members.fetch(message.author.id);
+    if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
+        throw "You don't have 'BAN' permissions on that server!";
+    }
+
     db.get("SELECT serverID FROM servers WHERE serverID = ?", [serverID], async (err, result) => {
         if (!!err) {
             await message.reply("Error running the query");
