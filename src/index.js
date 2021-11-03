@@ -13,6 +13,7 @@ const prefix = (process.env.PREFIX).trim().toLowerCase();
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity(`for ${prefix} help`, { type: 'WATCHING' });
 });
 
 client.on('guildMemberAdd', async member => {
