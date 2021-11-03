@@ -26,10 +26,17 @@ client.on('guildMemberAdd', async member => {
 
         let susScore = evaluator(member);
 
+        let color = parseInt("2f3136", 16)
+        if (susScore >= 0.75) {
+            color = parseInt("ff0000", 16);
+        } else if (susScore >= 0.4) {
+            color = parseInt("ffff00", 16);
+        }
+
         axios.post(row.webhook, {
             "content": member.id,
             "embeds": [{
-                "color": parseInt("2f3136", 16),
+                "color": color,
                 "title": "New Member Join!",
                 "fields": [
                     {
