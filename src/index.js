@@ -72,7 +72,7 @@ client.on('guildMemberAdd', async member => {
                     },
                     {
                         name: "Sus Grade",
-                        value: `${susScore}`,
+                        value: `${susScore.toFixed(5)}`,
                         inline: true
                     }
                 ],

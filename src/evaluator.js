@@ -8,7 +8,6 @@ const secs2days = 60 * 60 * 24;
  * @param {GuildMember} member 
  */
 function evaluator(member) {
-    let hasDefaultPfp = /discordapp.com\/embed\/avatars\/[0-9]\.png/.test(member.avatarURL());
     let age = member.user.createdTimestamp;
     let time = new Date().getTime();
     // At the moment, there are 13 possible user badges
@@ -16,19 +15,14 @@ function evaluator(member) {
     // Default pfp doesn't guarantee much
     // This formula can be made better
     let daysAge = Math.abs(time - age) / secs2days;  // [0, inf]
-    let daysTime = time / secs2days;
-    let ageRating = 1 - Math.log10(daysAge) / Math.log10(daysTime);  // log10 increasing. argmax log10(time - age) would be time
+    let ageRating = agePolynom(daysAge);
     let ageWeight = 1;
 
-    let pfpRating = hasDefaultPfp ? 1 : 0.3;
-    let pfpWeight = 1;
+    let badgesRating = Math.exp(-badges);  //  e^(-x), its 1 at x=0, decreases and lim -> inf is 0
+    let badgesWeight = 0.5;
 
-    let badgesRating = 1 - Math.log2(badges + 1);
-    let badgesWeight = 0.7;
+    let average = ((ageRating * ageWeight) + (badgesRating * badgesWeight)) / (ageWeight + badgesWeight);
 
-    let average = ((ageRating * ageWeight) + (pfpRating * pfpWeight) + (badgesRating * badgesWeight)) / (ageWeight + pfpWeight + badgesWeight);
-
-    // return (Math.log10((age / time) + 0.5)) * (hasDefaultPfp ? 1 : 0.7) * (1 - Math.log2(badges + 1));
     return average + (1 - average) * evalModifiers(member);
 }
 
@@ -50,7 +44,33 @@ function evalModifiers(member) {
         }
     }
 
-    return 0;
+    let elements = [];
+
+    let hasDefaultPfp = /discordapp.com\/embed\/avatars\/[0-9]\.png/.test(member.avatarURL());
+    let pfpRating = hasDefaultPfp ? 0.5 : 0;
+
+    elements.push([pfpRating, 1]);  // rating, weight
+
+    // Weighted average
+    let num = 0;
+    let den = 0;
+    for (let i in elements) {
+        num += elements[i][0] * elements[i][1];
+        den += elements[i][1];
+    }
+
+    return num / den;
+}
+
+/** This function was created using Linear Least Squares with:
+ * y = [1; 0.5; 0.3; 0.1; 0];
+ * x = [0; 30; 100; 180; 200];
+ * 
+ * @param {Number} x 
+ */
+function agePolynom(x) {
+    if (x >= 197) return 0;
+    return 0.9817666 + -0.0196763 * x + 0.000177 * Math.pow(x, 2) + -0.00000052 * Math.pow(x, 3);
 }
 
 module.exports = {
