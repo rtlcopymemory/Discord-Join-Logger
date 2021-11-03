@@ -1,6 +1,7 @@
 const { GuildMember } = require("discord.js");
 
 const dangerChars = ['卐'];
+const secs2days = 60 * 60 * 24;
 
 /** returns a number between 0 and 1 where 1 means the account is suspecious
  * 
@@ -14,7 +15,9 @@ function evaluator(member) {
     let badges = member.user.flags.toArray().length / 13;
     // Default pfp doesn't guarantee much
     // This formula can be made better
-    let ageRating = Math.log10(age / time);
+    let daysAge = Math.abs(time - age) / secs2days;  // [0, inf]
+    let daysTime = time / secs2days;
+    let ageRating = 1 - Math.log10(daysAge) / Math.log10(daysTime);  // log10 increasing. argmax log10(time - age) would be time
     let ageWeight = 1;
 
     let pfpRating = hasDefaultPfp ? 1 : 0.3;
