@@ -24,9 +24,9 @@ function evaluator(member) {
     let pfpWeight = 1;
 
     let badgesRating = 1 - Math.log2(badges + 1);
-    let badgesWeight = 1;
+    let badgesWeight = 0.7;
 
-    let average = ((ageRating * ageWeight) + (pfpRating * pfpWeight) + (badgesRating * badgesWeight)) / 3;
+    let average = ((ageRating * ageWeight) + (pfpRating * pfpWeight) + (badgesRating * badgesWeight)) / (ageWeight + pfpWeight + badgesWeight);
 
     // return (Math.log10((age / time) + 0.5)) * (hasDefaultPfp ? 1 : 0.7) * (1 - Math.log2(badges + 1));
     return average + (1 - average) * evalModifiers(member);
