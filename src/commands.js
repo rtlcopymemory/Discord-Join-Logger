@@ -151,7 +151,7 @@ async function handleAlert(message, serverID, roleID) {
 
     // check that the person giving the command has permissions to remove this
     let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
-    let user = server.members.cache.get(message.author.id) || server.members.fetch(message.author.id);
+    let user = server.members.fetch(message.author.id);
     if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
         return;
     }
