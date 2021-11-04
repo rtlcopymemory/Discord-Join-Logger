@@ -52,8 +52,8 @@ async function handleLink(message, serverID) {
     }
 
     // check that the person giving the command has permissions to remove this
-    let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
-    let user = server.members.cache.get(message.author.id) || server.members.fetch(message.author.id);
+    let server = message.client.guilds.cache.get(serverID) || await message.client.guilds.fetch(serverID);
+    let user = server.members.cache.get(message.author.id) || await server.members.fetch(message.author.id);
     if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
         throw "You don't have 'BAN' permissions on that server!";
     }
@@ -101,8 +101,8 @@ async function handleRemove(message, serverID) {
     }
 
     // check that the person giving the command has permissions to remove this
-    let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
-    let user = server.members.cache.get(message.author.id) || server.members.fetch(message.author.id);
+    let server = message.client.guilds.cache.get(serverID) || await message.client.guilds.fetch(serverID);
+    let user = server.members.cache.get(message.author.id) || await server.members.fetch(message.author.id);
     if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
         return;
     }
@@ -150,9 +150,8 @@ async function handleAlert(message, serverID, roleID) {
     }
 
     // check that the person giving the command has permissions to remove this
-    let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
-    let user = server.members.cache.get(serverID) || server.members.fetch(message.author.id);
-    console.log(`${user}, ${user.permissions}, ${typeof user}`);
+    let server = message.client.guilds.cache.get(serverID) || await message.client.guilds.fetch(serverID);
+    let user = server.members.cache.get(serverID) || await server.members.fetch(message.author.id);
     if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
         return;
     }
@@ -171,7 +170,7 @@ async function handleAlert(message, serverID, roleID) {
         return;
     }
 
-    let role = message.guild.roles.cache.get(roleID) || message.guild.roles.fetch(roleID);
+    let role = message.guild.roles.cache.get(roleID) || await message.guild.roles.fetch(roleID);
     if (!role) {
         await message.reply(`Role \`${roleID}\` does not exist`);
         return;
