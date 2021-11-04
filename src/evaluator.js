@@ -14,7 +14,7 @@ function evaluator(member) {
     let badges = member.user.flags.toArray().length / 13;
     // Default pfp doesn't guarantee much
     // This formula can be made better
-    let daysAge = Math.abs(time - age) / secs2days;  // [0, inf]
+    let daysAge = Math.floor(Math.abs(time - age) / secs2days);  // [0, inf]
     let ageRating = agePolynom(daysAge);
     let ageWeight = 1;
 
