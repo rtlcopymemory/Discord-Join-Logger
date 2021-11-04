@@ -10,6 +10,7 @@ const { db } = require('./db');
 const { evaluator } = require('./evaluator.js');
 
 const prefix = (process.env.PREFIX).trim().toLowerCase();
+const alertThreshold = 0.8;
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -17,7 +18,7 @@ client.on('ready', () => {
 });
 
 client.on('guildMemberAdd', async member => {
-    db.get("SELECT webhook FROM servers WHERE serverID = ?", [member.guild.id], (err, row) => {
+    db.get("SELECT webhook, roleID FROM servers WHERE serverID = ?", [member.guild.id], (err, row) => {
         if (!!err) {
             console.log(`There was an error!\n${err}`)
         }
@@ -34,8 +35,13 @@ client.on('guildMemberAdd', async member => {
             color = parseInt("ffff00", 16);
         }
 
+        let rolePing = '';
+        if (susScore >= alertThreshold && row.roleID.length > 0) {
+            rolePing = "<@&" + row.roleID + ">";
+        }
+
         axios.post(row.webhook, {
-            "content": member.id,
+            "content": `${member.id} ${rolePing}`,
             "embeds": [{
                 "color": color,
                 "title": "New Member Join!",

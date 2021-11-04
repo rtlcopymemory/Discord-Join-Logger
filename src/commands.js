@@ -16,11 +16,24 @@ async function handleCommands(message, argv) {
             }
             break;
         case 'remove':
-            await handleRemove(message, argv[2]);
+            try {
+                await handleRemove(message, argv[2]);
+            } catch (e) {
+                await message.reply("Error: " + e);
+            }
             break;
         case 'help':
             await message.reply(`Usage:\nIn the channel you want to receive your join updates run \`${argv[0]} link <Server ID>\`\n` +
                 `**Attention**: The bot must be in the server already to monitor its joins`)
+            break;
+        case 'alert':
+            if (argv.length < 3) {
+                await message.reply(`Please provide at least a serverID.\nUsage: \`${argv[0]} alert <ServerID> [RoleID]\``);
+            } else if (argv.length < 4) {
+                handleAlert(message, argv[2], undefined);
+                break;
+            }
+            handleAlert(message, argv[2], argv[3]);
             break;
     }
 }
@@ -113,6 +126,65 @@ async function handleRemove(message, serverID) {
 
         await message.reply("Operation completed successfully");
     })
+}
+
+/**
+ * Parameter roleID can be undefined. If it is, remove the record from the DB
+ * @param {Message} message 
+ * @param {String} roleID 
+ */
+async function handleAlert(message, serverID, roleID) {
+    if (!/^[0-9]+$/.test(serverID)) {
+        await message.reply("Invalid server ID");
+        return;
+    }
+
+    if (!!roleID && !/^[0-9]+$/.test(roleID)) {
+        await message.reply("Invalid role ID");
+        return;
+    }
+
+    if (message.channel.type !== "GUILD_TEXT") {
+        await message.reply("Command not called in a normal Text Channel");
+        return;
+    }
+
+    // check that the person giving the command has permissions to remove this
+    let server = message.client.guilds.cache.get(serverID) || message.client.guilds.fetch(serverID);
+    let user = server.members.cache.get(message.author.id) || server.members.fetch(message.author.id);
+    if (!user.permissions.has([Permissions.FLAGS.BAN_MEMBERS])) {
+        return;
+    }
+
+    if (!roleID) {
+        // Delete from db
+        try {
+            var stmt = db.prepare("UPDATE servers SET roleID = '' WHERE serverID = ?");
+            stmt.run(serverID);
+            stmt.finalize();
+        } catch (e) {
+            await message.reply("Error occured while removing the role. Did you already setup the bot for logs?");
+            return;
+        }
+        await message.reply("Role Successfully deleted");
+        return;
+    }
+
+    let role = message.guild.roles.cache.get(roleID) || message.guild.roles.fetch(roleID);
+    if (!role) {
+        await message.reply(`Role \`${roleID}\` does not exist`);
+        return;
+    }
+
+    try {
+        var stmt = db.prepare("UPDATE servers SET roleID = ? WHERE serverID = ?");
+        stmt.run(roleID, serverID);
+        stmt.finalize();
+    } catch (e) {
+        await message.reply("Error occured while adding the role. Did you already setup the bot for logs?");
+        return;
+    }
+    await message.reply("Role added as alert");
 }
 
 module.exports = {
