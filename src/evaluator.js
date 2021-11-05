@@ -38,8 +38,8 @@ function evaluator(member) {
  * @param {GuildMember} member 
  */
 function evalModifiers(member) {
-    for (let char in dangerChars) {
-        if (member.displayName.includes(char)) {
+    for (let i in dangerChars) {
+        if (member.displayName.includes(dangerChars[i])) {
             return 1;
         }
     }
