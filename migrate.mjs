@@ -7,5 +7,5 @@ dotenv.config();
 var db = new sqlite3.Database(process.env.DB_PATH);
 
 db.serialize(function () {
-    db.run("ALTER TABLE servers ADD COLUMN roleID TEXT");
+    db.run("ALTER TABLE servers ADD COLUMN roleID TEXT DEFAULT ''");
 });
