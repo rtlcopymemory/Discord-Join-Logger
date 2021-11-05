@@ -76,7 +76,7 @@ async function handleLink(message, serverID) {
             return;
         }
 
-        var stmt = db.prepare("INSERT INTO servers VALUES (?, ?)");
+        var stmt = db.prepare("INSERT INTO servers (serverID, webhook) VALUES (?, ?)");
         stmt.run(serverID, webhook.url);
         stmt.finalize();
 
