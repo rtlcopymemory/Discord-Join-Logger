@@ -9,7 +9,7 @@ const secs2days = 60 * 60 * 24;
  */
 function evaluator(member) {
     let age = member.user.createdTimestamp;
-    let time = new Date().getTime();
+    let time = Math.floor(new Date().getTime() / 1000);  // .getTime() uses milliseconds in JS. We need UNIX Time
     // At the moment, there are 13 possible user badges
     let badges = member.user.flags.toArray().length / 13;
     // Default pfp doesn't guarantee much
