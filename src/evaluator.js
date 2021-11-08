@@ -1,20 +1,20 @@
 const { GuildMember } = require("discord.js");
 
 const dangerChars = ['卐'];
-const secs2days = 60 * 60 * 24;
+const ms2days = 1000 * 60 * 60 * 24;
 
 /** returns a number between 0 and 1 where 1 means the account is suspecious
  * 
  * @param {GuildMember} member 
  */
 function evaluator(member) {
-    let age = member.user.createdTimestamp;
-    let time = Math.floor(new Date().getTime() / 1000);  // .getTime() uses milliseconds in JS. We need UNIX Time
+    let age = member.user.createdTimestamp;  // ms
+    let time = new Date().getTime();  // .getTime() uses milliseconds in JS.
     // At the moment, there are 13 possible user badges
     let badges = member.user.flags.toArray().length / 13;
     // Default pfp doesn't guarantee much
     // This formula can be made better
-    let daysAge = Math.floor(Math.abs(time - age) / secs2days);  // [0, inf]
+    let daysAge = Math.floor(Math.abs(time - age) / ms2days);  // [0, inf]
     let ageRating = agePolynom(daysAge);
     let ageWeight = 1;
 
