@@ -48,7 +48,12 @@ client.on('guildMemberAdd', async member => {
                 "fields": [
                     {
                         name: "Username",
-                        value: member.displayName,
+                        value: member.user.username,
+                        inline: true
+                    },
+                    {
+                        name: "Discriminator",
+                        value: member.user.discriminator,
                         inline: true
                     },
                     {
@@ -79,6 +84,11 @@ client.on('guildMemberAdd', async member => {
                     {
                         name: "Sus Grade",
                         value: `${susScore.toFixed(5)}`,
+                        inline: true
+                    },
+                    {
+                        name: "Mention",
+                        value: `<@${member.user.id}>`,
                         inline: true
                     }
                 ],
