@@ -1,4 +1,4 @@
-const { GuildMember } = require("discord.js");
+const { GuildMember, UserManager } = require("discord.js");
 
 const regexes = require("./wordlists/regex.json").elements.map(e => new RegExp(e));
 
@@ -13,7 +13,7 @@ function evaluator(member) {
     let age = member.user.createdTimestamp;  // ms
     let time = new Date().getTime();  // .getTime() uses milliseconds in JS.
     // At the moment, there are 13 possible user badges
-    let badges = member.user.flags.toArray().length / 13;
+    let badges = (member.user.flags.toArray().length + (tryGetNitro(member) ? 1 : 0)) / (13 + 1);
     // Default pfp doesn't guarantee much
     // This formula can be made better
     let daysAge = Math.floor(Math.abs(time - age) / ms2days);  // [0, inf]
@@ -87,6 +87,17 @@ function checkRegexes(username) {
 function agePolynom(x) {
     if (x >= 197) return 0;
     return 0.9817666 + -0.0196763 * x + 0.000177 * Math.pow(x, 2) + -0.00000052 * Math.pow(x, 3);
+}
+
+/** Unfortunately, discord doesn't allow bots to see if a user has nitro or not,
+ * This function tries to assume it by seeing if the user has a banner or an animated pfp
+ * 
+ * @param {GuildMember} member 
+ */
+function tryGetNitro(member) {
+    let user = member.client.users.resolve(member.id);
+    let pfp = user.displayAvatarURL({ dynamic: true }).endsWith('.gif');
+    return pfp || !!user.banner;
 }
 
 module.exports = {
