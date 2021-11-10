@@ -1,0 +1,17 @@
+{
+    "elements": [
+        "H\\.?U\\.?N\\.?K\\.?",
+        "\b(?<!van.)dykes?\b",
+        "\bfagg?(s?\b|ot|y|ier)",
+        "\bgooks?\b",
+        "honk(ey|ie)",
+        "\bkikes?\b",
+        "nigg(a|er)s?",
+        "shemale",
+        "\bspick?s?\b",
+        "beaner",
+        "trann(ie|y)",
+        "cunt",
+        "hook.?nose"
+    ]
+}

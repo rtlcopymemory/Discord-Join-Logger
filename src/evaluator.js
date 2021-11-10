@@ -1,5 +1,7 @@
 const { GuildMember } = require("discord.js");
 
+const regexes = require("./wordlists/regex.json").elements.map(e => new RegExp(e));
+
 const dangerChars = ['卐'];
 const ms2days = 1000 * 60 * 60 * 24;
 
@@ -44,6 +46,8 @@ function evalModifiers(member) {
         }
     }
 
+    if (checkRegexes(member.user.username)) return 0.9;
+
     let elements = [];
 
     let hasDefaultPfp = /discordapp.com\/embed\/avatars\/[0-9]\.png/.test(member.avatarURL());
@@ -60,6 +64,18 @@ function evalModifiers(member) {
     }
 
     return num / den;
+}
+
+/** Iterates through all the Regex values and returns true if any of them matches
+ * 
+ * @param {string} username 
+ */
+function checkRegexes(username) {
+    for (let i in regexes)
+        if (regexes[i].test(username))
+            return true;
+
+    return false;
 }
 
 /** This function was created using Linear Least Squares with:
