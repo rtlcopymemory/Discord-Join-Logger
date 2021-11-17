@@ -2,7 +2,7 @@ const { GuildMember, UserManager } = require("discord.js");
 
 const regexes = require("./wordlists/regex.json").elements.map(e => new RegExp(e));
 
-const dangerChars = ['卐'];
+const dangerChars = ['卐', 'ζ'];
 const ms2days = 1000 * 60 * 60 * 24;
 
 /** returns a number between 0 and 1 where 1 means the account is suspecious
